@@ -520,7 +520,7 @@
           <div class="panel-actions">
             <span class="char-count" id="output-count">0 chars</span>
             <div id="segment-toggle" style="display:inline-flex;position:relative;background:var(--bg);border-radius:6px;padding:2px;font-size:11px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;">
-              <div id="seg-slider" style="position:absolute;top:2px;left:2px;height:calc(100% - 4px);width:50%;border-radius:4px;background:var(--accent);transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);pointer-events:none;z-index:0;"></div>
+              <div id="seg-slider" style="position:absolute;top:2px;left:2px;height:calc(100% - 4px);border-radius:4px;background:var(--accent);transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);pointer-events:none;z-index:0;"></div>
               <button id="seg-text" style="position:relative;z-index:1;padding:5px 12px;border:none;border-radius:4px;cursor:pointer;background:transparent;color:#fff;font-size:11px;font-family:var(--sans);touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:color 0.3s ease;">Text</button>
               <button id="seg-md" style="position:relative;z-index:1;padding:5px 12px;border:none;border-radius:4px;cursor:pointer;background:transparent;color:var(--text-muted);font-size:11px;font-family:var(--sans);touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:color 0.3s ease;">Markdown</button>
             </div>
@@ -1096,14 +1096,25 @@
     // Segment toggle with fade
     const segSlider = document.getElementById('seg-slider');
 
+    function updateSlider(isMd) {
+      const target = isMd ? segMd : segText;
+      const toggle = document.getElementById('segment-toggle');
+      const toggleRect = toggle.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      segSlider.style.width = targetRect.width + 'px';
+      segSlider.style.transform = 'translateX(' + (targetRect.left - toggleRect.left - 2) + 'px)';
+    }
+
+    // Init slider position
+    requestAnimationFrame(() => updateSlider(false));
+
     function setSegment(isMd) {
       previewMode = isMd;
+      // Slide indicator
+      updateSlider(isMd);
       if (isMd) {
-        // Slide indicator right
-        segSlider.style.transform = 'translateX(100%)';
         segMd.style.color = '#fff';
         segText.style.color = 'var(--text-muted)';
-        // Crossfade content
         outputEl.style.opacity = '0';
         outputEl.style.transform = 'translateY(4px)';
         setTimeout(() => {
@@ -1116,11 +1127,8 @@
           });
         }, 250);
       } else {
-        // Slide indicator left
-        segSlider.style.transform = 'translateX(0)';
         segText.style.color = '#fff';
         segMd.style.color = 'var(--text-muted)';
-        // Crossfade content
         previewEl.style.opacity = '0';
         previewEl.style.transform = 'translateY(4px)';
         setTimeout(() => {
