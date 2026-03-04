@@ -606,12 +606,7 @@
       // Strip leading whitespace per line (left-align)
       // Keep relative indent for lines starting with list markers or code
       let lines = text.split('\n');
-      lines = lines.map(l => {
-        // Preserve indent for list items (strip only 1 leading space if present)
-        if (/^\s*([-*+]|\d+\.)\s/.test(l)) return l.replace(/^ /, '');
-        // All other lines: strip all leading spaces
-        return l.replace(/^ +/, '');
-      });
+      lines = lines.map(l => l.replace(/^ +/, ''));
       const result = [];
       let i = 0;
 
