@@ -520,8 +520,8 @@
           <div class="panel-actions">
             <span class="char-count" id="output-count">0 chars</span>
             <div id="segment-toggle" style="display:inline-flex;background:var(--bg);border-radius:6px;padding:2px;gap:2px;font-size:11px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;user-select:none;">
-              <button id="seg-text" style="padding:5px 12px;border:none;border-radius:4px;cursor:pointer;background:var(--accent);color:#fff;font-size:11px;font-family:var(--sans);touch-action:manipulation;-webkit-tap-highlight-color:transparent;">Text</button>
-              <button id="seg-md" style="padding:5px 12px;border:none;border-radius:4px;cursor:pointer;background:transparent;color:var(--text-muted);font-size:11px;font-family:var(--sans);touch-action:manipulation;-webkit-tap-highlight-color:transparent;">Markdown</button>
+              <button id="seg-text" style="padding:5px 12px;border:none;border-radius:4px;cursor:pointer;background:var(--accent);color:#fff;font-size:11px;font-family:var(--sans);touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:all 0.25s ease;">Text</button>
+              <button id="seg-md" style="padding:5px 12px;border:none;border-radius:4px;cursor:pointer;background:transparent;color:var(--text-muted);font-size:11px;font-family:var(--sans);touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:all 0.25s ease;">Markdown</button>
             </div>
             <button class="btn btn-primary" id="btn-copy" title="コピー">
               <svg id="copy-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
@@ -530,8 +530,8 @@
             </button>
           </div>
         </div>
-        <textarea class="output-text empty" id="output" placeholder="⚡ 左にテキストをペーストすると整形結果がここに表示されます" spellcheck="false" autocorrect="off"></textarea>
-        <div class="output-text" id="output-preview" style="display:none;padding:16px;overflow-y:auto;font-family:var(--sans);font-size:13.5px;line-height:1.75;color:var(--text);"></div>
+        <textarea class="output-text empty" id="output" placeholder="⚡ 左にテキストをペーストすると整形結果がここに表示されます" spellcheck="false" autocorrect="off" style="transition:opacity 0.2s ease;"></textarea>
+        <div class="output-text" id="output-preview" style="display:none;padding:16px;overflow-y:auto;font-family:var(--sans);font-size:13.5px;line-height:1.75;color:var(--text);opacity:0;transition:opacity 0.2s ease;"></div>
       </div>
     </div>
 
@@ -922,20 +922,28 @@
       return html;
     }
 
-    // Segment toggle
+    // Segment toggle with fade
     function setSegment(isMd) {
       previewMode = isMd;
       if (isMd) {
         segMd.style.background = 'var(--accent)'; segMd.style.color = '#fff';
         segText.style.background = 'transparent'; segText.style.color = 'var(--text-muted)';
-        outputEl.style.display = 'none';
-        previewEl.style.display = 'block';
-        previewEl.innerHTML = mdToHtml(outputEl.value);
+        outputEl.style.opacity = '0';
+        setTimeout(() => {
+          outputEl.style.display = 'none';
+          previewEl.style.display = 'block';
+          previewEl.innerHTML = mdToHtml(outputEl.value);
+          requestAnimationFrame(() => { previewEl.style.opacity = '1'; });
+        }, 200);
       } else {
         segText.style.background = 'var(--accent)'; segText.style.color = '#fff';
         segMd.style.background = 'transparent'; segMd.style.color = 'var(--text-muted)';
-        outputEl.style.display = '';
-        previewEl.style.display = 'none';
+        previewEl.style.opacity = '0';
+        setTimeout(() => {
+          previewEl.style.display = 'none';
+          outputEl.style.display = '';
+          requestAnimationFrame(() => { outputEl.style.opacity = '1'; });
+        }, 200);
       }
     }
     document.getElementById('segment-toggle').addEventListener('click', () => setSegment(!previewMode));
